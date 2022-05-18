@@ -1,0 +1,229 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>El Tepenene</title>
+	
+	
+<!-- -----LIBRERIAS-------- -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+  crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+  integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+  crossorigin=""></script>
+  
+  <!-- Librería y API para ver imágenes de Google Earth-->
+<script src="http://maps.google.com/maps/api/js?v=3&sensor=false"></script>
+<script src="leaflet-plugins-1.9.3\layer\tile\Google.js"></script>
+	
+  
+<!--   d3 -->
+  	<script src="https://d3js.org/d3.v5.min.js"></script>
+   <link rel="stylesheet" href="leaflet-elevation.css" />
+   <script type="text/javascript" src="leaflet-elevation.js"></script>
+   
+ <!-- -----CAPAS JSON------ -->
+<script src="dist/leaflet.polylineDecorator.js"></script>
+<script type="text/javascript" src="json/geologia.js"></script>
+<script type="text/javascript" src="json/contactos.js"></script>
+<script type="text/javascript" src="json/puntos.js"></script>
+<script type="text/javascript" src="json/2.js"></script>
+ <!-- -----ESTILOS DEL MAPA------ --> 
+	<style>
+	#mapDIV {
+	margin-left: 20%;
+	height: 100%;
+	width: 65%;
+	border: solid 2px black;
+	}
+	
+	#sideDIV {
+	float:left;
+	
+	}
+	</style>
+</head>
+<body>
+
+<div id="sideDIV"> 
+<img src="Icon/SimboloTepenene.png" alt="simbologia"  align="left" width="300px" height="500px">
+</div>
+<main id="mapDIV"></main>
+<div id="elevation-div"></div>
+
+
+
+ <script>
+ <!-- ------ CARACTERISTICAS DEL MAPA------ --> 
+ var map = L.map('mapDIV', {
+		center:[18.426728 , -98.408051],
+		zoom:11.5
+	});
+	
+	var scale = L.control.scale({
+		'imperial':false
+	});
+	scale.addTo(map);
+	
+<!-- ------ ESTILOS PARA CAPAS VECTORIALES ------ -->
+
+	var contact_style = {
+		color: "#000000",
+		weight: 1,
+		opacity: 0.3,
+	};
+	
+	var seccion_style = {
+		color: "#000000",
+		weight: 2,
+		opacity: 1,
+	};
+	
+	var puntos_style  = L.icon({
+	iconUrl: 'Icon/punto.png',
+	iconSize: [10, 10],
+});
+	  
+function estiloIcon(feature, latlng) {
+	return L.marker(latlng, {
+		icon: puntos_style
+	})
+};
+
+<!-- ------CAPAS BASE------ -->
+	
+		var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+    		maxZoom: 20,
+    		subdomains:['mt0','mt1','mt2','mt3']
+		});
+	
+	var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+	maxZoom: 17,
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+	}); 
+	topo.addTo(map);
+	
+
+	
+<!-- ----- CONTROLADOR DEL MAPA------	 -->
+
+	var basemaps = {
+		"Google Hybrid": googleHybrid,
+		"Topografía": topo,										
+		};
+		
+	L.control.layers(basemaps).addTo(map);
+
+	
+	    var multiCoords1 = [
+		[[18.3745334444311,  -98.4103335590804],  [18.3752155423261,  -98.4103892253196],  [18.3765339642899,  -98.4091677206876],  [18.3788821176746,  -98.4073476344055],  [18.3798820927696,  -98.4067920926861],  [18.3814098324981,  -98.4054865696454],  [18.386204255914,  -98.400239920068],  [18.3929367793886,  -98.3962054642087],  [18.3969997220005,  -98.3940354659532],  [18.3991341391497,  -98.392356019735],  [18.4035273372042,  -98.3888689279621],  [18.4069994729509,  -98.3866745381703],  [18.4089369246974,  -98.3845704239076],  [18.4102386316535,  -98.3832160891255]],
+		[[18.359452305636,  -98.3850151233411],  [18.3596855471653,  -98.3874199623136],  [18.360018872197,  -98.3894476895896],  [18.361311034431,  -98.391970334343],  [18.363046574568,  -98.3941142400331],  [18.3639382225796,  -98.3948672029388],  [18.3646817143444,  -98.3968308220769],  [18.36522882632,  -98.3982699965429],  [18.3660088981255,  -98.3999024262529],  [18.3666575957445,  -98.4018084928477],  [18.3679633690522,  -98.4036335347178],  [18.3698585374473,  -98.4054740923115],  [18.3739734809298,  -98.4100465124593]],
+		[[18.5075959241235,  -98.3338830142176],  [18.508294878821,  -98.3258398649283],  [18.5087330506601,  -98.3195933839314],  [18.5091705394314,  -98.3184540150207],  [18.5055430786479,  -98.3120036593214],  [18.5043226189066,  -98.3069434111803],  [18.5024063630363,  -98.3017223317354],  [18.4977680456395,  -98.2975656463689],  [18.4971291726621,  -98.2944823898259],  [18.4959139251508,  -98.2927393776811],  [18.4960995409099,  -98.2913688559041],  [18.4960805876666,  -98.2899061149118],  [18.4955250426794,  -98.2893705685419]],
+		[[18.5132401202904,  -98.3647510790773],  [18.5164411916849,  -98.3588141209396],  [18.5201876300724,  -98.3545958600627],  [18.5225703068405,  -98.3510531574847],  [18.5230243610605,  -98.3494254658807],  [18.522827147784,  -98.3460105645377],  [18.5223577119002,  -98.3438822778793],  [18.5223854880831,  -98.3406756837991],  [18.5211195724364,  -98.3375891500748],  [18.5196706950064,  -98.3351641883635],  [18.518120161783,  -98.3338076163681]],
+        [[18.3655842193667,  -98.4596967935163],  [18.3557572045597,  -98.4508972597679]],
+        [[18.328358895351,  -98.4813100006519],  [18.3292334587979,  -98.4809718361798],  [18.3309953642752,  -98.4808316345708],  [18.3324452917642,  -98.4809186067022],  [18.3333708155823,  -98.4814478906382],  [18.3370501204572,  -98.4828326779963],  [18.337886176897,  -98.4829887626721],  [18.3387823074411,  -98.4839144844978],  [18.340997210526,  -98.4865442296767],  [18.3419138543631,  -98.4874608735138],  [18.345233099709,  -98.4896565332035],  [18.3488359396536,  -98.4924163319004],  [18.352175872501,  -98.4958447669759],  [18.3538055873654,  -98.4984936098612],  [18.3552809037493,  -98.5001529007825],  [18.3572189903638,  -98.5024346528017],  [18.3584494947314,  -98.5045938097591],  [18.3586356601189,  -98.5048771064189],  [18.3589689851506,  -98.5074881525004],  [18.3598022977298,  -98.5088214526271],  [18.3641355231416,  -98.5111269507629],  [18.3657188170421,  -98.5117380466543],  [18.3711353488068,  -98.5125435821475],  [18.3751769148159,  -98.5125713592335],  [18.3762324440829,  -98.5117936008262],  [18.3778383068656,  -98.5117936008262]],
+		[[18.4430445821706,  -98.5112085459528],  [18.4492110952566,  -98.5158750963963],  [18.4525453221116,  -98.5189858045125],  [18.4561440823087,  -98.5218100614295],  [18.459977320173,  -98.5235877949318],  [18.4606439702363,  -98.5240877824793],  [18.4626468489136,  -98.5266699586152]]
+		
+	];
+	
+
+    var plArray = [];
+    for(var i=0; i<multiCoords1.length; i++) {
+        plArray.push(L.polyline(multiCoords1[i], {color:'black'}).addTo(map));
+    }
+    L.polylineDecorator(multiCoords1, {
+         patterns: [
+                { offset: 0, repeat: 500, symbol: L.Symbol.dash({pixelSize: 1, pathOptions: {weight: 0.1, opacity: 0.2}}) },
+                { offset: '5%', repeat: '15%', symbol: L.Symbol.marker({rotate: true, angleCorrection: -90, markerOptions: {
+                    icon: L.icon({
+                        iconUrl: 'Icon/linea.svg',
+                        iconAnchor: [1, 1]
+                    })
+                }})}
+            ]
+        }
+    ).addTo(map);
+	
+	
+<!-- ----- CAPAS VECTORIALES------	 ---->
+		var el = L.control.elevation({
+  			position: "bottomleft",
+            theme: "magenta-theme", //default: lime-theme
+            useHeightIndicator: true, //if false a marker is drawn at map position
+            interpolation: d3.curveLinear, //see https://github.com/d3/d3/wiki/
+            collapsed: false, //collapsed mode, show chart on click or mouseover
+            detachedView: true, //if false the chart is drawn within map container
+            elevationDiv: "#elevation-div", // (detached) elevation chart container
+			});
+		el.addTo(map);
+		
+		var se = L.geoJson(se,{
+			style:seccion_style,
+		    onEachFeature: el.addData.bind(el)
+		}).addTo(map);
+
+
+
+var geology = L.geoJson(geology, {
+  style:function(feature){
+	switch (feature.properties.Name){
+	case 'Andesita': return {color:'#00ff00', fillOpacity: .5, weight: 0};
+	case 'Cenozoico Indiferenciado': return {color:'#f7ec30', fillOpacity: .5, weight: 0};
+	case 'Complejo Acatlan': return {color:'#dcbfdc', fillOpacity: .5, weight: 0};			
+	case 'Depositos Recientes': return {color:'#f1f4c7', fillOpacity: .5, weight: 0};
+	case 'Fm Cuautla': return {color:'#aed36b', fillOpacity: .5, weight: 0};
+	case 'Fm Puerto El Gato': return {color:'#fcc491', fillOpacity: .5, weight: 0};
+	case 'Ignimbrita Superlítica': return {color:'#ff6701', fillOpacity: .5, weight: 0};
+	case 'Litodema Tepenene': return {color:'#fd2929', fillOpacity: .5, weight: 0};
+	case 'Miembro Inferior': return {color:'#f58d75', fillOpacity: .5, weight: 0};
+	case 'Miembro Superior': return {color:'#f8a76f', fillOpacity: .5, weight: 0};
+	case 'Yesos': return {color:'#c8c445', fillOpacity: .5, weight: 0};			
+		}
+		},
+		onEachFeature: function( feature, layer ){
+      		layer.bindPopup( "<strong>" + "LITOLOGÍA:" + "</strong><br/>"+ feature.properties.LITOLOGIA)
+    }
+	}).addTo(map);
+	
+	var contactos = L.geoJson(contactos,{
+	style: contact_style
+	}).addTo (map);
+	
+	var puntos =L.geoJson(puntos, {
+	pointToLayer: estiloIcon,
+	onEachFeature: function( feature, layer ){
+		layer.bindPopup('Punto De Verificación')}
+	}).addTo (map);
+	
+	
+//Marcadores.
+	var skf = [
+    //Coordenadas del marcador
+    [18.420460, -98.331450]
+	];
+
+	var arregloDeMarcadores =[];
+
+	//Información del ícono que se desea representar en el mapa
+	var skfIcon = L.icon({
+    iconUrl: 'Icon/sketchfab.png',
+    iconSize: [25, 25],
+    iconAnchor: [25, 25],
+    popupAnchor: [-3, -76],
+	});
+
+	for (var i=0; i < skf.length; i++) {
+	arregloDeMarcadores[i] = new L.marker(skf[i], {icon: skfIcon}).addTo(map);
+	}
+
+//Información que se desplegará en el PopUp al dar click en el marcador.
+	var popupskf = L.popup({
+	minWidth: 250
+	}).setContent('<div class="sketchfab-embed-wrapper"> <iframe title="Peñón, Puebla, México" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/81656d28f2be4faab8828c136e2f3e02/embed"> </iframe> <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;"> <a href="https://sketchfab.com/3d-models/penon-puebla-mexico-81656d28f2be4faab8828c136e2f3e02?utm_medium=embed&utm_campaign=share-popup&utm_content=81656d28f2be4faab8828c136e2f3e02" target="_blank" style="font-weight: bold; color: #1CAAD9;"> Peñón, Puebla, México </a> by <a href="https://sketchfab.com/IngenieriaGeologicaAsistida?utm_medium=embed&utm_campaign=share-popup&utm_content=81656d28f2be4faab8828c136e2f3e02" target="_blank" style="font-weight: bold; color: #1CAAD9;"> Ingeniería Geológica Asistida </a> on <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=81656d28f2be4faab8828c136e2f3e02" target="_blank" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a></p></div>')
+	arregloDeMarcadores[0].bindPopup(popupskf);
+
+
+
+ </script>
+</body>
+</html>
